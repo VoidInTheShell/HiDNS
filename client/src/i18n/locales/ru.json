@@ -709,7 +709,15 @@
             "oauthAutoRegisterDesc": "Автоматически создавать локальную учётную запись, когда непривязанный пользователь входит через OAuth",
             "oauthDefaultRole": "Роль по умолчанию для новых пользователей",
             "oauthDefaultTeam": "Команда по умолчанию для новых пользователей",
-            "oauthDefaultTeamNone": "Без команды"
+            "oauthDefaultTeamNone": "Без команды",
+            "oauthTeamModeFixed": "Назначить фиксированную команду",
+            "oauthTeamModeDepartment": "Сопоставление по отделу Feishu",
+            "oauthFeishuAppId": "ID приложения Feishu",
+            "oauthFeishuAppSecret": "Секрет приложения Feishu",
+            "oauthFeishuAppIdPlaceholder": "напр. cli_xxxxxxxx (требуется право чтения контактов)",
+            "oauthFeishuSecretPlaceholder": "Те же учётные данные приложения Feishu, что и в Casdoor",
+            "oauthDefaultTeamRequired": "Сначала выберите команду по умолчанию",
+            "oauthFeishuCredentialsRequired": "Сначала заполните учётные данные приложения Feishu"
         },
         "domains": {
             "title": "Домены",

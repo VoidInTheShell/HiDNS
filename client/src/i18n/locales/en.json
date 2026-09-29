@@ -709,7 +709,15 @@
             "oauthAutoRegisterDesc": "Automatically create a local account when an unbound user signs in via OAuth",
             "oauthDefaultRole": "Default role for new users",
             "oauthDefaultTeam": "Default team for new users",
-            "oauthDefaultTeamNone": "No team"
+            "oauthDefaultTeamNone": "No team",
+            "oauthTeamModeFixed": "Assign a fixed team",
+            "oauthTeamModeDepartment": "Match by Feishu department",
+            "oauthFeishuAppId": "Feishu App ID",
+            "oauthFeishuAppSecret": "Feishu App Secret",
+            "oauthFeishuAppIdPlaceholder": "e.g. cli_xxxxxxxx (contact read permission required)",
+            "oauthFeishuSecretPlaceholder": "Same Feishu app credentials as configured in Casdoor",
+            "oauthDefaultTeamRequired": "Please select a default team first",
+            "oauthFeishuCredentialsRequired": "Please fill in the Feishu app credentials first"
         },
         "domains": {
             "title": "Domains",

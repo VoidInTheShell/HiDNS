@@ -1099,7 +1099,15 @@
             "oauthAutoRegisterDesc": "未绑定用户通过 OAuth 登录时自动创建本地账号",
             "oauthDefaultRole": "新用户默认角色",
             "oauthDefaultTeam": "新用户默认团队",
-            "oauthDefaultTeamNone": "不加入团队"
+            "oauthDefaultTeamNone": "不加入团队",
+            "oauthTeamModeFixed": "指定团队",
+            "oauthTeamModeDepartment": "按飞书部门匹配",
+            "oauthFeishuAppId": "飞书 App ID",
+            "oauthFeishuAppSecret": "飞书 App Secret",
+            "oauthFeishuAppIdPlaceholder": "如 cli_xxxxxxxx（需开通通讯录读取权限）",
+            "oauthFeishuSecretPlaceholder": "与 Casdoor 中配置的同一飞书应用凭据",
+            "oauthDefaultTeamRequired": "已选择指定团队模式，请先选择默认团队",
+            "oauthFeishuCredentialsRequired": "已选择按飞书部门匹配，请先填写飞书应用凭据"
         },
         "network": {
             "title": "网络信息",

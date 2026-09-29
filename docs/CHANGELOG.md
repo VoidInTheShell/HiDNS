@@ -3,15 +3,20 @@
 ## [Unreleased]
 
 ### ✨ 新功能
-- **OAuth 自动建户（JIT Provisioning）**: OAuth 配置新增 `autoRegister` 开关；开启后未绑定用户首次 OAuth 登录不再返回 403，而是自动创建本地账号并登录。配套 `defaultRole`（1=member 默认 / 2=admin，超管不可自动创建）与 `defaultTeamId`（可选自动加入默认团队）两项默认身份配置，管理员可在系统设置 → 访问控制页配置，并新增 `oauth_auto_provision` 审计事件
+- **OAuth 自动建户（JIT Provisioning）**: OAuth 配置新增 `autoRegister` 开关；开启后未绑定用户首次 OAuth 登录不再返回 403，而是自动创建本地账号并登录。配套 `defaultRole`（1=member 默认 / 2=admin，超管不可自动创建）与默认团队策略三项默认身份配置：`defaultTeamMode`（none=不加入 / fixed=指定团队 / department=按飞书部门匹配）+ `defaultTeamId`（fixed 模式用）+ `feishuAppId/feishuAppSecret`（department 模式用，需在飞书开放平台开通通讯录读取权限）。管理员可在系统设置 → 访问控制页配置，并新增 `oauth_auto_provision` 审计事件（含 teamMode 与实际加入团队）
 - **provider_hint 透传**: OAuth 配置新增可选 `providerHint` 字段，会作为 `provider_hint` 查询参数附加到授权端点 URL（例如 Casdoor 用于预选飞书等社交登录方式）
 
+### 🐛 Bug 修复
+- **登录页 OAuth 按钮文案/对齐**: OAuth 按钮文案缺失 provider 插值参数导致显示原始 `{provider}` 占位符，现改用实际 providerName（如「飞书」）；`.lc-sso` 按钮高度 36→39px，与主登录按钮对齐
+
 ### 📝 文件变更
-- `server/src/service/oauth-provision.ts` - 新增 JIT 建户服务（用户名派生/去重、随机不可用密码、角色钳位、默认团队、审计）
-- `server/src/routes/auth.ts` - OAuth 回调新增 JIT 分支；授权 URL 支持 provider_hint
-- `server/src/routes/settings.ts` - oauth_config 新字段规范化校验（defaultTeamId 存在性校验）
-- `server/src/service/oauth-provision.test.ts` / `server/src/routes/auth.oauth-jit.test.ts` - 新增 21 项测试
-- `client/src/pages/system/AccessTab.tsx` - 自动建户开关 + 默认角色/团队选择器
+- `server/src/service/oauth-provision.ts` - 新增 JIT 建户服务（用户名派生/去重、随机不可用密码、角色钳位、团队策略 none/fixed/department、审计）
+- `server/src/service/feishu-contacts.ts` - 新增飞书通讯录查询服务（app_access_token → 用户 department_ids → 部门名）
+- `server/src/routes/auth.ts` - OAuth 回调新增 JIT 分支；授权 URL 支持 provider_hint；旧配置 defaultTeamId 向后兼容推导为 fixed 模式
+- `server/src/routes/settings.ts` - oauth_config 新字段规范化校验（团队策略/fixed 团队存在性/department 模式飞书凭据必填）
+- `server/src/service/oauth-provision.test.ts` / `server/src/service/feishu-contacts.test.ts` / `server/src/routes/auth.oauth-jit.test.ts` - 新增 33 项测试
+- `client/src/pages/system/AccessTab.tsx` - 自动建户开关 + 默认角色/团队模式选择器 + 飞书凭据输入
+- `client/src/pages/LoginCard.tsx` / `client/src/pages/Login.css` - 登录页 OAuth 按钮文案插值与高度对齐修复
 - `client/src/utils/auditLogs.ts` - oauth_auto_provision 标签与颜色
 - `client/src/i18n/locales/*` - 11 语言新增文案
 

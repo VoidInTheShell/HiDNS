@@ -709,7 +709,15 @@
             "oauthAutoRegisterDesc": "إنشاء حساب محلي تلقائيًا عندما يسجّل مستخدم غير مرتبط الدخول عبر OAuth",
             "oauthDefaultRole": "الدور الافتراضي للمستخدمين الجدد",
             "oauthDefaultTeam": "الفريق الافتراضي للمستخدمين الجدد",
-            "oauthDefaultTeamNone": "بدون فريق"
+            "oauthDefaultTeamNone": "بدون فريق",
+            "oauthTeamModeFixed": "تعيين فريق محدد",
+            "oauthTeamModeDepartment": "المطابقة حسب قسم Feishu",
+            "oauthFeishuAppId": "معرّف تطبيق Feishu",
+            "oauthFeishuAppSecret": "سر تطبيق Feishu",
+            "oauthFeishuAppIdPlaceholder": "مثل cli_xxxxxxxx (يتطلب إذن قراءة جهات الاتصال)",
+            "oauthFeishuSecretPlaceholder": "نفس بيانات اعتماد تطبيق Feishu المكونة في Casdoor",
+            "oauthDefaultTeamRequired": "يرجى اختيار فريق افتراضي أولاً",
+            "oauthFeishuCredentialsRequired": "يرجى إدخال بيانات اعتماد تطبيق Feishu أولاً"
         },
         "domains": {
             "title": "النطاقات",

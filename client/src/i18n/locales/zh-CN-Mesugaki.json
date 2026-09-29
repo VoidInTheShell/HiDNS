@@ -1099,7 +1099,15 @@
             "oauthAutoRegisterDesc": "没绑定的小可爱用 OAuth 登录时，会自动给 TA 建一个本地账号哦",
             "oauthDefaultRole": "新用户默认角色哒",
             "oauthDefaultTeam": "新用户默认团队哒",
-            "oauthDefaultTeamNone": "不加入团队"
+            "oauthDefaultTeamNone": "不加入团队",
+            "oauthTeamModeFixed": "指定好一个团队",
+            "oauthTeamModeDepartment": "按飞书部门匹配",
+            "oauthFeishuAppId": "飞书 App ID 的说",
+            "oauthFeishuAppSecret": "飞书 App Secret 的说",
+            "oauthFeishuAppIdPlaceholder": "像是 cli_xxxxxxxx 这样（要先开通通讯录权限哦）",
+            "oauthFeishuSecretPlaceholder": "和 Casdoor 里配的是同一个飞书应用的说",
+            "oauthDefaultTeamRequired": "要先选好团队才能继续的说",
+            "oauthFeishuCredentialsRequired": "要先填好飞书应用凭据的说"
         },
         "teams": {
             "addMember": "添加成员",

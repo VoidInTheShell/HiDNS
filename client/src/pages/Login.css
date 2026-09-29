@@ -314,7 +314,7 @@ html.dark .lc-btn-primary { background: #266fe8; }
 /* ─── SSO row ────────────────────────────────────────────────────────────── */
 .lc-sso {
   width: 341px;
-  height: 36px;
+  height: 39px;
   background: var(--lc-surface, #fff);
   border-radius: 6px;
   border: 1px solid rgba(192, 192, 192, 0.16);

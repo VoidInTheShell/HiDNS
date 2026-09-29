@@ -167,8 +167,13 @@ type OAuthConfig = {
   autoRegister: boolean;
   /** 自动建户的默认角色：1=member（默认），2=admin */
   defaultRole: number;
-  /** 自动建户后加入的默认团队 ID（null 表示不加入） */
+  /** 自动建户的默认团队策略：none=不加入；fixed=加入 defaultTeamId；department=按飞书部门名匹配团队 */
+  defaultTeamMode: 'none' | 'fixed' | 'department';
+  /** defaultTeamMode=fixed 时加入的团队 ID（null 表示未指定） */
   defaultTeamId: number | null;
+  /** defaultTeamMode=department 时查询飞书通讯录的应用凭据 */
+  feishuAppId: string;
+  feishuAppSecret: string;
 };
 
 const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
@@ -190,7 +195,10 @@ const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   providerHint: '',
   autoRegister: false,
   defaultRole: 1,
+  defaultTeamMode: 'none',
   defaultTeamId: null,
+  feishuAppId: '',
+  feishuAppSecret: '',
 };
 
 type OAuthUserProfile = Record<string, unknown>;
@@ -259,7 +267,12 @@ async function getOAuthConfigByProvider(provider: 'custom' | 'logto'): Promise<O
         sanitized[k as keyof OAuthConfig] = v as never;
       }
     }
-    return { ...defaults, ...sanitized };
+    const merged = { ...defaults, ...sanitized };
+    // 向后兼容：旧配置未写 defaultTeamMode 但设置了 defaultTeamId 时，视为 fixed
+    if (sanitized.defaultTeamMode === undefined && Number(merged.defaultTeamId) > 0) {
+      merged.defaultTeamMode = 'fixed';
+    }
+    return merged;
   } catch {
     return defaults;
   }
@@ -1062,7 +1075,12 @@ router.post('/oauth/callback', async (req: Request, res: Response) => {
             email: normalizedEmail,
             profile: mergedProfile,
             defaultRole: config.defaultRole,
-            defaultTeamId: config.defaultTeamId,
+            teamPolicy: {
+              mode: config.defaultTeamMode === 'fixed' || config.defaultTeamMode === 'department' ? config.defaultTeamMode : 'none',
+              fixedTeamId: config.defaultTeamId ?? null,
+              feishuAppId: String(config.feishuAppId || ''),
+              feishuAppSecret: String(config.feishuAppSecret || ''),
+            },
           });
           const created = await UserOperations.getPublicById(provisioned.userId);
           if (!created) {

@@ -709,7 +709,15 @@
             "oauthAutoRegisterDesc": "Crée automatiquement un compte local lorsqu'un utilisateur non lié se connecte via OAuth",
             "oauthDefaultRole": "Rôle par défaut des nouveaux utilisateurs",
             "oauthDefaultTeam": "Équipe par défaut des nouveaux utilisateurs",
-            "oauthDefaultTeamNone": "Aucune équipe"
+            "oauthDefaultTeamNone": "Aucune équipe",
+            "oauthTeamModeFixed": "Attribuer une équipe fixe",
+            "oauthTeamModeDepartment": "Correspondance par département Feishu",
+            "oauthFeishuAppId": "ID d'application Feishu",
+            "oauthFeishuAppSecret": "Secret d'application Feishu",
+            "oauthFeishuAppIdPlaceholder": "ex. cli_xxxxxxxx (permission de lecture des contacts requise)",
+            "oauthFeishuSecretPlaceholder": "Identiques aux identifiants de l'application Feishu configurés dans Casdoor",
+            "oauthDefaultTeamRequired": "Veuillez d'abord sélectionner une équipe par défaut",
+            "oauthFeishuCredentialsRequired": "Veuillez d'abord renseigner les identifiants de l'application Feishu"
         },
         "domains": {
             "title": "Domaines",

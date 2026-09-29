@@ -570,7 +570,15 @@
             "oauthAutoRegisterDesc": "未バインドのユーザーが OAuth でログインした際にローカルアカウントを自動作成します",
             "oauthDefaultRole": "新規ユーザーのデフォルトロール",
             "oauthDefaultTeam": "新規ユーザーのデフォルトチーム",
-            "oauthDefaultTeamNone": "チームに追加しない"
+            "oauthDefaultTeamNone": "チームに追加しない",
+            "oauthTeamModeFixed": "固定チームを指定",
+            "oauthTeamModeDepartment": "Feishu 部門でマッチ",
+            "oauthFeishuAppId": "Feishu App ID",
+            "oauthFeishuAppSecret": "Feishu App Secret",
+            "oauthFeishuAppIdPlaceholder": "例: cli_xxxxxxxx（連絡先読み取り権限が必要）",
+            "oauthFeishuSecretPlaceholder": "Casdoor に設定した同じ Feishu アプリの資格情報",
+            "oauthDefaultTeamRequired": "先に既定のチームを選択してください",
+            "oauthFeishuCredentialsRequired": "先に Feishu アプリの資格情報を入力してください"
         },
         "domains": {
             "tabs": {

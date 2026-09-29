@@ -54,7 +54,7 @@ vi.mock('../db/bal/business-adapter', () => ({
     addMember: vi.fn(async (teamId: number, userId: number, role: string) => {
       mocks.teamAdds.push({ teamId, userId, role });
     }),
-    getById: vi.fn(),
+    getById: vi.fn(async (teamId: number) => ({ id: teamId, name: `team-${teamId}` })),
   },
   SettingsOperations: {
     get: vi.fn(async (key: string) => (key === 'oauth_config' ? JSON.stringify(mocks.oauthConfig) : undefined)),

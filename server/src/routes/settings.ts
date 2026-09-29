@@ -34,8 +34,13 @@ type OAuthConfig = {
   autoRegister: boolean;
   /** 自动建户的默认角色：1=member（默认），2=admin */
   defaultRole: number;
-  /** 自动建户后加入的默认团队 ID（null 表示不加入） */
+  /** 自动建户的默认团队策略：none=不加入；fixed=加入 defaultTeamId；department=按飞书部门名匹配团队 */
+  defaultTeamMode: 'none' | 'fixed' | 'department';
+  /** defaultTeamMode=fixed 时加入的团队 ID（null 表示未指定） */
   defaultTeamId: number | null;
+  /** defaultTeamMode=department 时查询飞书通讯录的应用凭据 */
+  feishuAppId: string;
+  feishuAppSecret: string;
 };
 const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   enabled: false,
@@ -56,7 +61,10 @@ const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   providerHint: '',
   autoRegister: false,
   defaultRole: 1,
+  defaultTeamMode: 'none',
   defaultTeamId: null,
+  feishuAppId: '',
+  feishuAppSecret: '',
 };
 const DEFAULT_LOGTO_OAUTH_CONFIG: OAuthConfig = {
   ...DEFAULT_OAUTH_CONFIG,
@@ -117,7 +125,12 @@ async function getOAuthConfig(): Promise<OAuthConfig> {
   if (!value) return DEFAULT_OAUTH_CONFIG;
   try {
     const parsed = JSON.parse(value) as Partial<OAuthConfig>;
-    return { ...DEFAULT_OAUTH_CONFIG, ...parsed };
+    const merged = { ...DEFAULT_OAUTH_CONFIG, ...parsed };
+    // 向后兼容：旧配置未写 defaultTeamMode 但设置了 defaultTeamId 时，视为 fixed
+    if (parsed.defaultTeamMode === undefined && Number(merged.defaultTeamId) > 0) {
+      merged.defaultTeamMode = 'fixed';
+    }
+    return merged;
   } catch {
     return DEFAULT_OAUTH_CONFIG;
   }
@@ -139,17 +152,33 @@ async function normalizeProvisionFields(config: OAuthConfig): Promise<OAuthConfi
   const autoRegister = config.autoRegister === true;
   // 仅接受 1/2，其余（含超管 3）一律降级为 member，防止误配置自动创建高权限账号
   const defaultRole = config.defaultRole === 2 ? 2 : 1;
+
+  // 团队策略：仅接受 none/fixed/department
+  const rawMode = String(config.defaultTeamMode || '').trim();
+  const defaultTeamMode: OAuthConfig['defaultTeamMode'] =
+    rawMode === 'fixed' || rawMode === 'department' ? rawMode : 'none';
+
   let defaultTeamId: number | null = config.defaultTeamId ?? null;
   if (typeof defaultTeamId === 'number' && (!Number.isInteger(defaultTeamId) || defaultTeamId <= 0)) {
     defaultTeamId = null;
   }
-  if (defaultTeamId !== null) {
+  if (defaultTeamMode === 'fixed') {
+    if (defaultTeamId === null) {
+      throw new Error('defaultTeamId is required when defaultTeamMode is fixed');
+    }
     const team = await TeamOperations.getById(defaultTeamId);
     if (!team) {
       throw new Error('defaultTeamId references a non-existent team');
     }
   }
-  return { ...config, autoRegister, defaultRole, defaultTeamId };
+
+  const feishuAppId = String(config.feishuAppId || '').trim();
+  const feishuAppSecret = String(config.feishuAppSecret || '').trim();
+  if (defaultTeamMode === 'department' && (!feishuAppId || !feishuAppSecret)) {
+    throw new Error('feishuAppId and feishuAppSecret are required when defaultTeamMode is department');
+  }
+
+  return { ...config, autoRegister, defaultRole, defaultTeamMode, defaultTeamId, feishuAppId, feishuAppSecret };
 }
 
 async function updateOAuthConfig(input: Partial<OAuthConfig>): Promise<OAuthConfig> {

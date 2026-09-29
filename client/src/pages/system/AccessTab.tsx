@@ -25,7 +25,10 @@ const DEFAULT_OAUTH_FORM = {
   providerHint: '',
   autoRegister: false,
   defaultRole: 1,
+  defaultTeamMode: 'none' as 'none' | 'fixed' | 'department',
   defaultTeamId: 0,
+  feishuAppId: '',
+  feishuAppSecret: '',
 };
 
 const DEFAULT_LOGTO_FORM = {
@@ -56,14 +59,25 @@ const accessField = (label: string, control: ReactNode) => (
 /** 将服务端 OAuthConfig 合并进表单时规范化 JIT 字段（团队 null → 0 表示不加入） */
 const mergeOauthForm = (
   prev: typeof DEFAULT_OAUTH_FORM,
-  config: Partial<Omit<typeof DEFAULT_OAUTH_FORM, 'defaultTeamId'>> & { defaultTeamId?: number | null }
-) => ({
-  ...prev,
-  ...config,
-  autoRegister: config.autoRegister === true,
-  defaultRole: Number(config.defaultRole) === 2 ? 2 : 1,
-  defaultTeamId: Number(config.defaultTeamId) > 0 ? Number(config.defaultTeamId) : 0,
-});
+  config: Partial<Omit<typeof DEFAULT_OAUTH_FORM, 'defaultTeamId' | 'defaultTeamMode'>> & {
+    defaultTeamId?: number | null;
+    defaultTeamMode?: 'none' | 'fixed' | 'department' | string;
+  }
+): typeof DEFAULT_OAUTH_FORM => {
+  const { defaultTeamId: rawTeamId, defaultTeamMode: rawTeamMode, ...rest } = config;
+  const defaultTeamMode: 'none' | 'fixed' | 'department' =
+    rawTeamMode === 'fixed' || rawTeamMode === 'department' ? rawTeamMode : 'none';
+  return {
+    ...prev,
+    ...rest,
+    autoRegister: config.autoRegister === true,
+    defaultRole: Number(config.defaultRole) === 2 ? 2 : 1,
+    defaultTeamId: Number(rawTeamId) > 0 ? Number(rawTeamId) : 0,
+    defaultTeamMode,
+    feishuAppId: String(config.feishuAppId ?? ''),
+    feishuAppSecret: String(config.feishuAppSecret ?? ''),
+  };
+};
 
 export function AccessTab() {
   const { t } = useI18n();
@@ -158,7 +172,10 @@ export function AccessTab() {
       providerHint: oauthForm.providerHint.trim(),
       autoRegister: oauthForm.autoRegister === true,
       defaultRole: oauthForm.defaultRole === 2 ? 2 : 1,
+      defaultTeamMode: oauthForm.defaultTeamMode === 'fixed' || oauthForm.defaultTeamMode === 'department' ? oauthForm.defaultTeamMode : 'none',
       defaultTeamId: oauthForm.defaultTeamId > 0 ? oauthForm.defaultTeamId : null,
+      feishuAppId: oauthForm.feishuAppId.trim(),
+      feishuAppSecret: oauthForm.feishuAppSecret.trim(),
     }),
     onSuccess: (res) => {
       if (res.data.code !== 0) {
@@ -219,6 +236,18 @@ export function AccessTab() {
       return;
     }
     revealJwtSecretMutation.mutate(jwtPassword.trim());
+  };
+
+  const handleSaveOauth = () => {
+    if (oauthForm.autoRegister && oauthForm.defaultTeamMode === 'fixed' && !(oauthForm.defaultTeamId > 0)) {
+      toast.error(t('system.oauthDefaultTeamRequired'));
+      return;
+    }
+    if (oauthForm.autoRegister && oauthForm.defaultTeamMode === 'department' && (!oauthForm.feishuAppId.trim() || !oauthForm.feishuAppSecret.trim())) {
+      toast.error(t('system.oauthFeishuCredentialsRequired'));
+      return;
+    }
+    updateOauthMutation.mutate();
   };
 
   const handleCopyJwtSecret = async () => {
@@ -392,6 +421,17 @@ export function AccessTab() {
             ))}
             {oauthForm.autoRegister && accessField(t('system.oauthDefaultTeam'), (
               <Select
+                value={oauthForm.defaultTeamMode}
+                options={[
+                  { label: t('system.oauthDefaultTeamNone'), value: 'none' },
+                  { label: t('system.oauthTeamModeFixed'), value: 'fixed' },
+                  { label: t('system.oauthTeamModeDepartment'), value: 'department' },
+                ]}
+                onChange={(value: any) => setOauthField('defaultTeamMode', String(Array.isArray(value) ? value[0] : value))}
+              />
+            ))}
+            {oauthForm.autoRegister && oauthForm.defaultTeamMode === 'fixed' && accessField(t('system.oauthTeamModeFixed'), (
+              <Select
                 value={oauthForm.defaultTeamId}
                 options={[
                   { label: t('system.oauthDefaultTeamNone'), value: 0 },
@@ -399,6 +439,21 @@ export function AccessTab() {
                 ]}
                 onChange={(value: any) => setOauthField('defaultTeamId', Number(Array.isArray(value) ? value[0] : value) || 0)}
                 placeholder={t('system.oauthDefaultTeamNone')}
+              />
+            ))}
+            {oauthForm.autoRegister && oauthForm.defaultTeamMode === 'department' && accessField(t('system.oauthFeishuAppId'), (
+              <Input
+                value={String(oauthForm.feishuAppId)}
+                onChange={(value: any) => setOauthField('feishuAppId', String(value))}
+                placeholder={t('system.oauthFeishuAppIdPlaceholder')}
+              />
+            ))}
+            {oauthForm.autoRegister && oauthForm.defaultTeamMode === 'department' && accessField(t('system.oauthFeishuAppSecret'), (
+              <Input
+                type="password"
+                value={String(oauthForm.feishuAppSecret)}
+                onChange={(value: any) => setOauthField('feishuAppSecret', String(value))}
+                placeholder={t('system.oauthFeishuSecretPlaceholder')}
               />
             ))}
           </div>
@@ -419,7 +474,7 @@ export function AccessTab() {
             <Button variant="outline" loading={discoverOidcMutation.isPending} onClick={() => discoverOidcMutation.mutate()}>
               {t('system.oidcAutoDiscover')}
             </Button>
-            <Button theme="primary" loading={updateOauthMutation.isPending} onClick={() => updateOauthMutation.mutate()}>
+            <Button theme="primary" loading={updateOauthMutation.isPending} onClick={handleSaveOauth}>
               {t('system.oauthSave')}
             </Button>
           </Space>

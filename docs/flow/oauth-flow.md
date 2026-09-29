@@ -69,7 +69,7 @@ sequenceDiagram
         Backend->>Backend: 28a. provisionOAuthUser() 创建本地用户
         Backend->>Adapter: 28b. INSERT INTO users（随机不可用密码、默认角色）
         Backend->>Adapter: 28c. INSERT INTO oauth_user_links（写入绑定）
-        Backend->>Adapter: 28d. 可选：INSERT INTO team_members（加入默认团队）
+        Backend->>Adapter: 28d. 可选：INSERT INTO team_members（按团队策略：fixed→指定团队；department→飞书部门名匹配）
         Backend->>Audit: 28e. 记录 oauth_auto_provision 审计日志
         Backend->>Backend: 28f. signToken() 生成 JWT（与已绑定分支一致）
         Backend-->>API: 32. 返回：{token, user}
@@ -159,7 +159,7 @@ POST /api/auth/oauth/callback (routes/auth.ts)
     → 用户名派生：邮箱本地部分 → preferred_username 等 profile 字段 → provider+subject 兑底，冲突时追加 -2/-3 序号
     → 密码为随机不可用值（OAuth 建户用户无本地密码）
     → 角色仅允许 member/admin（defaultRole=1/2，超管不可自动创建）
-    → 可选加入 defaultTeamId 指定的默认团队（失败仅告警不阻断）
+    → 可选按团队策略加入默认团队（失败仅告警不阻断）：none=不加入；fixed=加入 defaultTeamId 指定团队；department=查飞书部门并与 HiDNS 团队名匹配（忽略大小写）
     → 记录 oauth_auto_provision 审计日志后正常登录
 ```
 

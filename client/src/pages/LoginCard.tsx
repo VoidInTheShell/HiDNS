@@ -184,7 +184,7 @@ function UsernamePanel({ username, setUsername, onContinue, loading, oauthEnable
           {oauthProviders.some((p) => p.key === 'custom') && (
             <SsoRow
               icon={<GlobePurple />}
-              label={t('login.oauthSignIn', { defaultValue: '通过 OAuth 登录' })}
+              label={t('login.oauthSignIn', { provider: oauthProviders.find((p) => p.key === 'custom')?.providerName || 'OAuth' })}
               brand=""
               onClick={() => onOauthLogin('custom')}
               disabled={oauthLoading || loading}

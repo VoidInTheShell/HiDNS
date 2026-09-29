@@ -311,7 +311,10 @@ export interface OAuthConfig {
   providerHint: string;
   autoRegister: boolean;
   defaultRole: number;
+  defaultTeamMode: 'none' | 'fixed' | 'department';
   defaultTeamId: number | null;
+  feishuAppId: string;
+  feishuAppSecret: string;
 }
 
 export interface UserToken {

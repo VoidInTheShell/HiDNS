@@ -6,6 +6,10 @@ const mocks = vi.hoisted(() => ({
   teamAdds: [] as Array<Record<string, unknown>>,
   auditCalls: [] as Array<unknown[]>,
   takenUsernames: new Set<string>(),
+  teamById: new Map<number, { id: number; name: string }>(),
+  allTeams: [] as Array<{ id: number; name: string }>,
+  departmentNames: [] as string[],
+  departmentError: null as Error | null,
 }));
 
 vi.mock('../db/bal/business-adapter', () => ({
@@ -27,12 +31,21 @@ vi.mock('../db/bal/business-adapter', () => ({
     addMember: vi.fn(async (teamId: number, userId: number, role: string) => {
       mocks.teamAdds.push({ teamId, userId, role });
     }),
-    getById: vi.fn(),
+    getById: vi.fn(async (teamId: number) => mocks.teamById.get(teamId)),
+    getAll: vi.fn(async () => mocks.allTeams),
   },
   SettingsOperations: {},
   TwoFAOperations: {},
   UserPreferencesOperations: {},
   DomainOperations: {},
+}));
+
+vi.mock('./feishu-contacts', () => ({
+  getFeishuUserDepartmentNames: vi.fn(async (_appId: string, _appSecret: string, openId: string) => {
+    if (mocks.departmentError) throw mocks.departmentError;
+    if (openId === 'ou_empty') return [];
+    return [...mocks.departmentNames];
+  }),
 }));
 
 vi.mock('./audit', () => ({
@@ -61,6 +74,10 @@ beforeEach(() => {
   mocks.teamAdds.length = 0;
   mocks.auditCalls.length = 0;
   mocks.takenUsernames.clear();
+  mocks.teamById.clear();
+  mocks.allTeams.length = 0;
+  mocks.departmentNames.length = 0;
+  mocks.departmentError = null;
 });
 
 describe('sanitizeUsernameCandidate', () => {
@@ -148,7 +165,6 @@ describe('provisionOAuthUser', () => {
     email: 'yuanqi@suanleme.cn',
     profile: { sub: 'ou_d658e00978b46ee5391f78482d8019e1', name: '袁旗', preferred_username: 'yuanqi202606' },
     defaultRole: 1,
-    defaultTeamId: null,
   };
 
   it('creates a member user with random password and binds the oauth identity', async () => {
@@ -172,6 +188,7 @@ describe('provisionOAuthUser', () => {
     expect(mocks.teamAdds).toEqual([]);
     expect(mocks.auditCalls).toHaveLength(1);
     expect(mocks.auditCalls[0][1]).toBe('oauth_auto_provision');
+    expect(mocks.auditCalls[0][3]).toMatchObject({ teamMode: 'none', teams: [] });
   });
 
   it('honors defaultRole=2 as admin but degrades super admin to member', async () => {
@@ -185,18 +202,96 @@ describe('provisionOAuthUser', () => {
     expect(mocks.createdUsers[0].role_level).toBe(1);
   });
 
-  it('adds the user to the default team as member', async () => {
-    await provisionOAuthUser({ ...baseOptions, defaultTeamId: 7 });
+  it('adds the user to the fixed team as member (teamPolicy mode=fixed)', async () => {
+    mocks.teamById.set(7, { id: 7, name: '运维组' });
+    const result = await provisionOAuthUser({
+      ...baseOptions,
+      teamPolicy: { mode: 'fixed', fixedTeamId: 7, feishuAppId: '', feishuAppSecret: '' },
+    });
     expect(mocks.teamAdds).toEqual([{ teamId: 7, userId: 1, role: 'member' }]);
-    expect(mocks.auditCalls[0][3]).toMatchObject({ teamId: 7 });
+    expect(result.joinedTeams).toEqual(['运维组']);
+    expect(mocks.auditCalls[0][3]).toMatchObject({ teamMode: 'fixed', teams: ['运维组'] });
+  });
+
+  it('skips fixed team silently when the team no longer exists', async () => {
+    const result = await provisionOAuthUser({
+      ...baseOptions,
+      teamPolicy: { mode: 'fixed', fixedTeamId: 99, feishuAppId: '', feishuAppSecret: '' },
+    });
+    expect(mocks.teamAdds).toEqual([]);
+    expect(result.joinedTeams).toEqual([]);
+    expect(mocks.oauthLinks).toHaveLength(1);
   });
 
   it('does not let a failing team membership break provisioning', async () => {
+    mocks.teamById.set(9, { id: 9, name: '九号团队' });
     const { TeamOperations } = await import('../db/bal/business-adapter');
     (TeamOperations.addMember as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('team gone'));
-    await expect(provisionOAuthUser({ ...baseOptions, defaultTeamId: 9 })).resolves.toMatchObject({ userId: 1 });
+    await expect(
+      provisionOAuthUser({
+        ...baseOptions,
+        teamPolicy: { mode: 'fixed', fixedTeamId: 9, feishuAppId: '', feishuAppSecret: '' },
+      })
+    ).resolves.toMatchObject({ userId: 1 });
     expect(mocks.oauthLinks).toHaveLength(1);
     expect(mocks.auditCalls).toHaveLength(1);
+  });
+
+  it('joins the team whose name matches the Feishu department (case-insensitive, trimmed)', async () => {
+    mocks.allTeams.push(
+      { id: 3, name: '运维组' },
+      { id: 4, name: 'Infrastructure' },
+      { id: 5, name: '未匹配团队' }
+    );
+    mocks.departmentNames.push(' 运维组 ', 'infrastructure');
+    const result = await provisionOAuthUser({
+      ...baseOptions,
+      teamPolicy: { mode: 'department', fixedTeamId: null, feishuAppId: 'cli_x', feishuAppSecret: 'sec' },
+    });
+    expect(mocks.teamAdds).toEqual([
+      { teamId: 3, userId: 1, role: 'member' },
+      { teamId: 4, userId: 1, role: 'member' },
+    ]);
+    expect(result.joinedTeams).toEqual(['运维组', 'Infrastructure']);
+    expect(mocks.auditCalls[0][3]).toMatchObject({ teamMode: 'department', teams: ['运维组', 'Infrastructure'] });
+  });
+
+  it('joins no team when no team name matches the departments', async () => {
+    mocks.allTeams.push({ id: 3, name: '运维组' });
+    mocks.departmentNames.push('财务部');
+    const result = await provisionOAuthUser({
+      ...baseOptions,
+      teamPolicy: { mode: 'department', fixedTeamId: null, feishuAppId: 'cli_x', feishuAppSecret: 'sec' },
+    });
+    expect(mocks.teamAdds).toEqual([]);
+    expect(result.joinedTeams).toEqual([]);
+  });
+
+  it('joins no team when the user has no Feishu departments', async () => {
+    const result = await provisionOAuthUser({
+      ...baseOptions,
+      subject: 'ou_empty',
+      teamPolicy: { mode: 'department', fixedTeamId: null, feishuAppId: 'cli_x', feishuAppSecret: 'sec' },
+    });
+    expect(mocks.teamAdds).toEqual([]);
+    expect(result.joinedTeams).toEqual([]);
+  });
+
+  it('falls back to no team when the Feishu API fails (e.g. missing contact permission)', async () => {
+    mocks.allTeams.push({ id: 3, name: '运维组' });
+    mocks.departmentNames.push('运维组');
+    mocks.departmentError = new Error('Feishu API failed: code=99991672');
+    const result = await provisionOAuthUser({
+      ...baseOptions,
+      teamPolicy: { mode: 'department', fixedTeamId: null, feishuAppId: 'cli_x', feishuAppSecret: 'sec' },
+    });
+    // 建户仍成功，只是不归属团队
+    expect(result.userId).toBe(1);
+    expect(mocks.teamAdds).toEqual([]);
+    expect(result.joinedTeams).toEqual([]);
+    expect(mocks.oauthLinks).toHaveLength(1);
+    expect(mocks.auditCalls).toHaveLength(1);
+    expect(mocks.auditCalls[0][3]).toMatchObject({ teamMode: 'department', teams: [] });
   });
 
   it('resolves username collisions with a numeric suffix', async () => {
