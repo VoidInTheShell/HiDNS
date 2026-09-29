@@ -312,6 +312,13 @@ html.dark .lc-btn-primary { background: #266fe8; }
 .lc-btn-outline:hover { background: var(--lc-surface, #f5f5f5); }
 
 /* ─── SSO row ────────────────────────────────────────────────────────────── */
+/* wrapper 需要确定宽度：.lc-step 是 flex 列容器，子项默认收缩到内容宽；
+   若不显式定宽，.lc-sso 在 ≤520px 断点下的 width:min(100%,341px) 会因
+   百分比解析依赖收缩到内容宽的父级而塌缩（循环依赖） */
+.lc-sso-row {
+  width: min(100%, 341px);
+}
+
 .lc-sso {
   width: 341px;
   height: 39px;
