@@ -472,6 +472,8 @@
             "oauthLogtoDomain": "Dominio de Logto (https://xxx.logto.io)",
             "oauthProvider": "Nombre del proveedor",
             "oauthProviderFixed": "Fijo",
+            "oauthProviderHint": "Pista del proveedor (opcional)",
+            "oauthProviderHintPlaceholder": "p. ej. feishu, se añade como provider_hint a la URL de autorización",
             "oauthRedirectUri": "URI de redirección",
             "oauthSave": "Guardar configuración OAuth",
             "oauthSaveFailed": "Error al guardar configuración OAuth",

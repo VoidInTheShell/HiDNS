@@ -678,6 +678,8 @@
             "oauthTemplateLogto": "Template Logto",
             "oauthProvider": "Nome do Provedor",
             "oauthProviderFixed": "Fixo",
+            "oauthProviderHint": "Dica do provedor (opcional)",
+            "oauthProviderHintPlaceholder": "ex.: feishu, anexado como provider_hint à URL de autorização",
             "oauthLogtoDomain": "Domínio Logto (https://xxx.logto.io)",
             "oauthIssuer": "URL do Emissor OIDC",
             "oauthSubjectKey": "Chave ID do Usuário (userinfo)",

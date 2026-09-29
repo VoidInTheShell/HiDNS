@@ -308,6 +308,7 @@ export interface OAuthConfig {
   jwksUri: string;
   scopes: string;
   redirectUri: string;
+  providerHint: string;
 }
 
 export interface UserToken {

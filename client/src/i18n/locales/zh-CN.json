@@ -1030,6 +1030,8 @@
             "oauthLogtoDomain": "Logto 域名（https://xxx.logto.io）",
             "oauthProvider": "配置名称",
             "oauthProviderFixed": "固定",
+            "oauthProviderHint": "登录提供商提示（可选）",
+            "oauthProviderHintPlaceholder": "例如 feishu，将作为 provider_hint 参数附加到授权 URL",
             "oauthRedirectUri": "回调地址",
             "oauthSave": "保存 OAuth 配置",
             "oauthSaveFailed": "保存 OAuth 配置失败",

@@ -468,6 +468,8 @@
             "oauthLogtoDomain": "Logto ドメイン（https://xxx.logto.io）",
             "oauthProvider": "プロバイダー名",
             "oauthProviderFixed": "固定",
+            "oauthProviderHint": "プロバイダーヒント（任意）",
+            "oauthProviderHintPlaceholder": "例: feishu。認可URLに provider_hint として付加されます",
             "oauthRedirectUri": "リダイレクト URI",
             "oauthSave": "OAuth 設定を保存",
             "oauthSaveFailed": "OAuth 設定の保存に失敗しました",

@@ -678,6 +678,8 @@
             "oauthTemplateLogto": "Шаблон Logto",
             "oauthProvider": "Имя провайдера",
             "oauthProviderFixed": "Фиксированный",
+            "oauthProviderHint": "Подсказка провайдера (необязательно)",
+            "oauthProviderHintPlaceholder": "напр. feishu, добавляется как provider_hint к URL авторизации",
             "oauthLogtoDomain": "Домен Logto (https://xxx.logto.io)",
             "oauthIssuer": "URL OIDC издателя",
             "oauthSubjectKey": "Ключ ID пользователя (userinfo)",

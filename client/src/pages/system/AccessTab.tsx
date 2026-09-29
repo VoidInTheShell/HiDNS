@@ -22,6 +22,7 @@ const DEFAULT_OAUTH_FORM = {
   jwksUri: '',
   scopes: 'openid profile email',
   redirectUri: '',
+  providerHint: '',
 };
 
 const DEFAULT_LOGTO_FORM = {
@@ -128,6 +129,7 @@ export function AccessTab() {
       jwksUri: oauthForm.jwksUri.trim(),
       scopes: oauthForm.scopes.trim(),
       redirectUri: oauthForm.redirectUri.trim(),
+      providerHint: oauthForm.providerHint.trim(),
     }),
     onSuccess: (res) => {
       if (res.data.code !== 0) {
@@ -259,6 +261,13 @@ export function AccessTab() {
                 value={String(oauthForm.providerName)}
                 onChange={(value: any) => setOauthField('providerName', String(value))}
                 placeholder={t('system.oauthProvider')}
+              />
+            ))}
+            {accessField(t('system.oauthProviderHint'), (
+              <Input
+                value={String(oauthForm.providerHint)}
+                onChange={(value: any) => setOauthField('providerHint', String(value))}
+                placeholder={t('system.oauthProviderHintPlaceholder')}
               />
             ))}
             {oauthForm.template === 'logto' && accessField(t('system.oauthLogtoDomain'), (

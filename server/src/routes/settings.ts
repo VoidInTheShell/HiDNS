@@ -29,6 +29,7 @@ type OAuthConfig = {
   jwksUri: string;
   scopes: string;
   redirectUri: string;
+  providerHint: string;
 };
 const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   enabled: false,
@@ -46,6 +47,7 @@ const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   jwksUri: '',
   scopes: 'openid profile email',
   redirectUri: '',
+  providerHint: '',
 };
 const DEFAULT_LOGTO_OAUTH_CONFIG: OAuthConfig = {
   ...DEFAULT_OAUTH_CONFIG,

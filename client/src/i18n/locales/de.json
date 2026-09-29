@@ -678,6 +678,8 @@
             "oauthTemplateLogto": "Logto-Vorlage",
             "oauthProvider": "Anbietername",
             "oauthProviderFixed": "Fest",
+            "oauthProviderHint": "Provider-Hinweis (optional)",
+            "oauthProviderHintPlaceholder": "z. B. feishu, wird als provider_hint an die Autorisierungs-URL angehängt",
             "oauthLogtoDomain": "Logto-Domain (https://xxx.logto.io)",
             "oauthIssuer": "OIDC Issuer-URL",
             "oauthSubjectKey": "Benutzer-ID-Schlüssel (userinfo)",

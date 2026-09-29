@@ -677,6 +677,8 @@
             "oauthTemplateLogto": "Logto 템플릿",
             "oauthProvider": "공급자 이름",
             "oauthProviderFixed": "고정",
+            "oauthProviderHint": "공급자 힌트 (선택)",
+            "oauthProviderHintPlaceholder": "예: feishu, 인가 URL에 provider_hint로 추가됨",
             "oauthLogtoDomain": "Logto 도메인 (https://xxx.logto.io)",
             "oauthIssuer": "OIDC 발급자 URL",
             "oauthSubjectKey": "사용자 ID 키 (userinfo)",

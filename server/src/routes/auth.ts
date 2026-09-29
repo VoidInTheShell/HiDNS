@@ -160,6 +160,8 @@ type OAuthConfig = {
   jwksUri: string;
   scopes: string;
   redirectUri: string;
+  /** 传递给 IdP 授权端点的 provider_hint 参数（例如 Casdoor 用来预选社交登录方式） */
+  providerHint: string;
 };
 
 const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
@@ -178,6 +180,7 @@ const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   jwksUri: '',
   scopes: 'openid profile email',
   redirectUri: '',
+  providerHint: '',
 };
 
 type OAuthUserProfile = Record<string, unknown>;
@@ -353,6 +356,11 @@ function buildOauthAuthUrl(config: OAuthConfig, state: string): string {
     scope: config.scopes || 'openid profile email',
     state,
   });
+  // 可选：向授权端点透传 provider_hint（例如 Casdoor 用于预选社交登录提供商）
+  const providerHint = String(config.providerHint || '').trim();
+  if (providerHint) {
+    query.set('provider_hint', providerHint);
+  }
   return `${config.authorizationEndpoint}?${query.toString()}`;
 }
 

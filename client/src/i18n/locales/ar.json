@@ -678,6 +678,8 @@
             "oauthTemplateLogto": "قالب Logto",
             "oauthProvider": "اسم المزود",
             "oauthProviderFixed": "ثابت",
+            "oauthProviderHint": "تلميح المزود (اختياري)",
+            "oauthProviderHintPlaceholder": "مثال: feishu، يُرسَل كمعامل provider_hint إلى رابط التفويض",
             "oauthLogtoDomain": "نطاق Logto (https://xxx.logto.io)",
             "oauthIssuer": "رابط مُصدر OIDC",
             "oauthSubjectKey": "مفتاح معرف المستخدم (userinfo)",
