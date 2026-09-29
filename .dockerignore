@@ -67,3 +67,6 @@ runtime/
 tmp/
 temp/
 *.tmp
+
+# Local agent workspace
+.pi/
