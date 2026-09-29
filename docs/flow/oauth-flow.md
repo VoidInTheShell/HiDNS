@@ -61,10 +61,19 @@ sequenceDiagram
     Adapter-->>OAuthOperations: 返回绑定信息
     OAuthOperations-->>Backend: 返回绑定信息
 
-    alt 未绑定
+    alt 未绑定且未开启 autoRegister
         Backend-->>API: 返回：账户未绑定
         API-->>Frontend: 提示先绑定账户
         Frontend-->>User: 显示错误
+    else 未绑定且开启 autoRegister（JIT 自动建户）
+        Backend->>Backend: 28a. provisionOAuthUser() 创建本地用户
+        Backend->>Adapter: 28b. INSERT INTO users（随机不可用密码、默认角色）
+        Backend->>Adapter: 28c. INSERT INTO oauth_user_links（写入绑定）
+        Backend->>Adapter: 28d. 可选：INSERT INTO team_members（加入默认团队）
+        Backend->>Audit: 28e. 记录 oauth_auto_provision 审计日志
+        Backend->>Backend: 28f. signToken() 生成 JWT（与已绑定分支一致）
+        Backend-->>API: 32. 返回：{token, user}
+        Frontend-->>User: 跳转到 Dashboard
     else 已绑定且状态正常
         Backend->>Backend: 28. signToken() 生成 JWT
         Backend->>AuditOperations: 29. log() 记录 OAuth 登录日志
@@ -143,8 +152,15 @@ POST /api/auth/oauth/callback (routes/auth.ts)
     → signToken() 生成 JWT
     → AuditOperations.log() 记录审计日志
     → 返回 {token, user}
-  → 如果未绑定：
+  → 如果未绑定且未开启 autoRegister：
     → 返回错误提示绑定账户
+  → 如果未绑定且开启 autoRegister（JIT）：
+    → provisionOAuthUser() 自动创建本地用户（server/src/service/oauth-provision.ts）
+    → 用户名派生：邮箱本地部分 → preferred_username 等 profile 字段 → provider+subject 兑底，冲突时追加 -2/-3 序号
+    → 密码为随机不可用值（OAuth 建户用户无本地密码）
+    → 角色仅允许 member/admin（defaultRole=1/2，超管不可自动创建）
+    → 可选加入 defaultTeamId 指定的默认团队（失败仅告警不阻断）
+    → 记录 oauth_auto_provision 审计日志后正常登录
 ```
 
 ## 数据流
@@ -173,7 +189,8 @@ POST /api/auth/oauth/callback (routes/auth.ts)
 查询是否已绑定本地账户
   ↓
 如果已绑定：生成 JWT 并登录
-如果未绑定：提示绑定账户
+如果未绑定且未开启 autoRegister：提示绑定账户
+如果未绑定且开启 autoRegister：JIT 自动建户 → 绑定 → 登录
 ```
 
 ## 安全机制
@@ -182,6 +199,7 @@ POST /api/auth/oauth/callback (routes/auth.ts)
 2. **Code 一次性使用**: 授权码只能使用一次
 3. **PKCE 支持**: 可选的 PKCE 流程增强安全性
 4. **Token 验证**: 验证 ID Token 的签名和声明
+5. **JIT 建户防护**: autoRegister 默认关闭；自动创建的角色仅限 member/admin（defaultRole 在保存与建户时双重钳位，超管不可自动创建）；新账号密码为随机不可用值；建议同时在 IdP 侧限制应用的可见范围，避免对所有 OAuth 用户开放注册
 
 ## 支持的 OAuth 提供商
 

@@ -1,5 +1,20 @@
 # 更新日志
 
+## [Unreleased]
+
+### ✨ 新功能
+- **OAuth 自动建户（JIT Provisioning）**: OAuth 配置新增 `autoRegister` 开关；开启后未绑定用户首次 OAuth 登录不再返回 403，而是自动创建本地账号并登录。配套 `defaultRole`（1=member 默认 / 2=admin，超管不可自动创建）与 `defaultTeamId`（可选自动加入默认团队）两项默认身份配置，管理员可在系统设置 → 访问控制页配置，并新增 `oauth_auto_provision` 审计事件
+- **provider_hint 透传**: OAuth 配置新增可选 `providerHint` 字段，会作为 `provider_hint` 查询参数附加到授权端点 URL（例如 Casdoor 用于预选飞书等社交登录方式）
+
+### 📝 文件变更
+- `server/src/service/oauth-provision.ts` - 新增 JIT 建户服务（用户名派生/去重、随机不可用密码、角色钳位、默认团队、审计）
+- `server/src/routes/auth.ts` - OAuth 回调新增 JIT 分支；授权 URL 支持 provider_hint
+- `server/src/routes/settings.ts` - oauth_config 新字段规范化校验（defaultTeamId 存在性校验）
+- `server/src/service/oauth-provision.test.ts` / `server/src/routes/auth.oauth-jit.test.ts` - 新增 21 项测试
+- `client/src/pages/system/AccessTab.tsx` - 自动建户开关 + 默认角色/团队选择器
+- `client/src/utils/auditLogs.ts` - oauth_auto_provision 标签与颜色
+- `client/src/i18n/locales/*` - 11 语言新增文案
+
 ## [2.1.3] - 2026-08-02
 
 ### 🧹 优化
