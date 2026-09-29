@@ -704,7 +704,12 @@
             "securityPolicyDesc": "시스템 수준 보안 정책 설정 구성",
             "require2FASystemDisabled": "시스템에 의해 비활성화됨",
             "twoFADisabledStatus": "비활성화됨",
-            "twoFAEnabledStatus": "활성화됨"
+            "twoFAEnabledStatus": "활성화됨",
+            "oauthAutoRegister": "첫 로그인 시 계정 자동 생성",
+            "oauthAutoRegisterDesc": "바인딩되지 않은 사용자가 OAuth로 로그인하면 로컬 계정을 자동으로 생성합니다",
+            "oauthDefaultRole": "신규 사용자 기본 역할",
+            "oauthDefaultTeam": "신규 사용자 기본 팀",
+            "oauthDefaultTeamNone": "팀 없음"
         },
         "nav": {
             "settings": "설정"
@@ -1265,7 +1270,8 @@
                 "remove_domain_permission": "도메인 권한 제거",
                 "add_team_domain_permission": "팀 도메인 권한 추가",
                 "update_team_domain_permission": "팀 도메인 권한 업데이트",
-                "remove_team_domain_permission": "팀 도메인 권한 제거"
+                "remove_team_domain_permission": "팀 도메인 권한 제거",
+                "oauth_auto_provision": "OAuth 자동 계정 생성"
             },
             "parts": {
                 "host": ", 호스트 {host}",

@@ -704,7 +704,12 @@
             "securityPolicy": "Politique de sécurité",
             "securityPolicyDesc": "Configurer les paramètres de politique de sécurité au niveau du système",
             "twoFADisabledStatus": "Désactivé",
-            "twoFAEnabledStatus": "Activé"
+            "twoFAEnabledStatus": "Activé",
+            "oauthAutoRegister": "Créer automatiquement un compte à la première connexion",
+            "oauthAutoRegisterDesc": "Crée automatiquement un compte local lorsqu'un utilisateur non lié se connecte via OAuth",
+            "oauthDefaultRole": "Rôle par défaut des nouveaux utilisateurs",
+            "oauthDefaultTeam": "Équipe par défaut des nouveaux utilisateurs",
+            "oauthDefaultTeamNone": "Aucune équipe"
         },
         "domains": {
             "title": "Domaines",
@@ -1262,7 +1267,8 @@
                 "remove_domain_permission": "Supprimer la permission de domaine",
                 "add_team_domain_permission": "Ajouter une permission de domaine d'équipe",
                 "update_team_domain_permission": "Mettre à jour la permission de domaine d'équipe",
-                "remove_team_domain_permission": "Supprimer la permission de domaine d'équipe"
+                "remove_team_domain_permission": "Supprimer la permission de domaine d'équipe",
+                "oauth_auto_provision": "Création automatique de compte OAuth"
             },
             "parts": {
                 "host": ", hôte {host}",

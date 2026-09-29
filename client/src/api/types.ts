@@ -309,6 +309,9 @@ export interface OAuthConfig {
   scopes: string;
   redirectUri: string;
   providerHint: string;
+  autoRegister: boolean;
+  defaultRole: number;
+  defaultTeamId: number | null;
 }
 
 export interface UserToken {

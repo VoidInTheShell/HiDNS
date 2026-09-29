@@ -18,6 +18,7 @@ import { verifyTrustedDevice, addTrustedDevice, DeviceInfo } from '../service/de
 import { getRequestIP } from '../middleware/clientIP';
 import db from '../db/bal/business-adapter';
 import { sendError } from '../utils/http';
+import { provisionOAuthUser } from '../service/oauth-provision';
 
 const log = createLogger('HTTP').sub('Route').sub('Auth');
 /**
@@ -162,6 +163,12 @@ type OAuthConfig = {
   redirectUri: string;
   /** 传递给 IdP 授权端点的 provider_hint 参数（例如 Casdoor 用来预选社交登录方式） */
   providerHint: string;
+  /** 未绑定用户首次 OAuth 登录时是否自动创建本地账号（JIT provisioning） */
+  autoRegister: boolean;
+  /** 自动建户的默认角色：1=member（默认），2=admin */
+  defaultRole: number;
+  /** 自动建户后加入的默认团队 ID（null 表示不加入） */
+  defaultTeamId: number | null;
 };
 
 const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
@@ -181,6 +188,9 @@ const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   scopes: 'openid profile email',
   redirectUri: '',
   providerHint: '',
+  autoRegister: false,
+  defaultRole: 1,
+  defaultTeamId: null,
 };
 
 type OAuthUserProfile = Record<string, unknown>;
@@ -1040,11 +1050,41 @@ router.post('/oauth/callback', async (req: Request, res: Response) => {
       return;
     }
 
-    const user = existingLink as LoginUserInfo | undefined;
+    let user = existingLink as LoginUserInfo | undefined;
 
     if (!user) {
-      res.status(403).json({ code: 403, msg: 'OAuth account is not bound. Please bind it in account settings first.' });
-      return;
+      // JIT provisioning：开启 autoRegister 时，未绑定用户首次登录自动创建本地账号
+      if (config.autoRegister === true) {
+        try {
+          const provisioned = await provisionOAuthUser({
+            provider: providerKey,
+            subject,
+            email: normalizedEmail,
+            profile: mergedProfile,
+            defaultRole: config.defaultRole,
+            defaultTeamId: config.defaultTeamId,
+          });
+          const created = await UserOperations.getPublicById(provisioned.userId);
+          if (!created) {
+            throw new Error('Provisioned user could not be loaded');
+          }
+          user = created as LoginUserInfo;
+        } catch (error) {
+          log.error('OAuth auto provisioning failed', {
+            provider: providerKey,
+            subject,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          res.status(500).json({
+            code: 500,
+            msg: `OAuth auto provisioning failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+          });
+          return;
+        }
+      } else {
+        res.status(403).json({ code: 403, msg: 'OAuth account is not bound. Please bind it in account settings first.' });
+        return;
+      }
     }
     if (user.status === 0) {
       res.status(403).json({ code: 403, msg: 'Account is disabled' });

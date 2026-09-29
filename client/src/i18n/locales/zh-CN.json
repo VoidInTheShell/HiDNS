@@ -122,7 +122,8 @@
                 "remove_domain_permission": "移除域名权限",
                 "add_team_domain_permission": "添加团队域名权限",
                 "update_team_domain_permission": "更新团队域名权限",
-                "remove_team_domain_permission": "移除团队域名权限"
+                "remove_team_domain_permission": "移除团队域名权限",
+                "oauth_auto_provision": "OAuth 自动建户"
             },
             "allActions": "全部操作",
             "clearFilters": "清空筛选",
@@ -1093,7 +1094,12 @@
             "unlockPlaceholder": "输入用户名或邮箱",
             "verifyAndViewJwt": "验证并查看",
             "versionDesc": "当前系统版本详情",
-            "versionInfo": "版本信息"
+            "versionInfo": "版本信息",
+            "oauthAutoRegister": "首次登录自动创建账号",
+            "oauthAutoRegisterDesc": "未绑定用户通过 OAuth 登录时自动创建本地账号",
+            "oauthDefaultRole": "新用户默认角色",
+            "oauthDefaultTeam": "新用户默认团队",
+            "oauthDefaultTeamNone": "不加入团队"
         },
         "network": {
             "title": "网络信息",
@@ -1534,11 +1540,11 @@
             "scopeLevelRead": "只读",
             "scopeLevelWrite": "读写",
             "scopeModule": {
-              "ns_monitor": "NS 监控",
-              "domain_management": "域名管理",
-              "renewal_management": "续期管理",
-              "log_query": "审计日志",
-              "service_monitor": "服务监控管理"
+                "ns_monitor": "NS 监控",
+                "domain_management": "域名管理",
+                "renewal_management": "续期管理",
+                "log_query": "审计日志",
+                "service_monitor": "服务监控管理"
             },
             "oauthScopeEditTitle": "编辑授权范围",
             "oauthScopeEditDesc": "逗号分隔的权限范围列表",

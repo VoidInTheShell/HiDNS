@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { authMiddleware, adminOnly, noTokenAuth } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 import { getLoginLimitConfig, updateLoginLimitConfig, getLoginAttemptStats, unlockAccount } from '../service/loginLimit';
-import { SettingsOperations, NotificationOperations, AuditRuleOperations, DomainExpiryOperations, UserOperations } from '../db/bal/business-adapter';
+import { SettingsOperations, NotificationOperations, AuditRuleOperations, DomainExpiryOperations, UserOperations, TeamOperations } from '../db/bal/business-adapter';
 import { getSmtpConfig, updateSmtpConfig, sendSmtpEmail } from '../service/smtp';
 import { logAuditOperation } from '../service/audit';
 import { createLogger } from '../lib/logger';
@@ -30,6 +30,12 @@ type OAuthConfig = {
   scopes: string;
   redirectUri: string;
   providerHint: string;
+  /** 未绑定用户首次 OAuth 登录时是否自动创建本地账号（JIT provisioning） */
+  autoRegister: boolean;
+  /** 自动建户的默认角色：1=member（默认），2=admin */
+  defaultRole: number;
+  /** 自动建户后加入的默认团队 ID（null 表示不加入） */
+  defaultTeamId: number | null;
 };
 const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   enabled: false,
@@ -48,6 +54,9 @@ const DEFAULT_OAUTH_CONFIG: OAuthConfig = {
   scopes: 'openid profile email',
   redirectUri: '',
   providerHint: '',
+  autoRegister: false,
+  defaultRole: 1,
+  defaultTeamId: null,
 };
 const DEFAULT_LOGTO_OAUTH_CONFIG: OAuthConfig = {
   ...DEFAULT_OAUTH_CONFIG,
@@ -125,8 +134,27 @@ async function getLogtoOAuthConfig(): Promise<OAuthConfig> {
   }
 }
 
+/** 规范化 JIT 自动建户相关字段：非法值安全降级 */
+async function normalizeProvisionFields(config: OAuthConfig): Promise<OAuthConfig> {
+  const autoRegister = config.autoRegister === true;
+  // 仅接受 1/2，其余（含超管 3）一律降级为 member，防止误配置自动创建高权限账号
+  const defaultRole = config.defaultRole === 2 ? 2 : 1;
+  let defaultTeamId: number | null = config.defaultTeamId ?? null;
+  if (typeof defaultTeamId === 'number' && (!Number.isInteger(defaultTeamId) || defaultTeamId <= 0)) {
+    defaultTeamId = null;
+  }
+  if (defaultTeamId !== null) {
+    const team = await TeamOperations.getById(defaultTeamId);
+    if (!team) {
+      throw new Error('defaultTeamId references a non-existent team');
+    }
+  }
+  return { ...config, autoRegister, defaultRole, defaultTeamId };
+}
+
 async function updateOAuthConfig(input: Partial<OAuthConfig>): Promise<OAuthConfig> {
-  const next = applyOAuthTemplate({ ...(await getOAuthConfig()), ...input });
+  const merged = await normalizeProvisionFields({ ...(await getOAuthConfig()), ...input });
+  const next = applyOAuthTemplate(merged);
   if (next.enabled) {
     const required = ['clientId', 'clientSecret', 'authorizationEndpoint', 'tokenEndpoint', 'userInfoEndpoint', 'jwksUri'] as const;
     for (const k of required) {

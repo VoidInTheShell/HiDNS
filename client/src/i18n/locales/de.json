@@ -704,7 +704,12 @@
             "securityPolicy": "Sicherheitsrichtlinie",
             "securityPolicyDesc": "Systemweite Sicherheitsrichtlinieneinstellungen konfigurieren",
             "twoFADisabledStatus": "Deaktiviert",
-            "twoFAEnabledStatus": "Aktiviert"
+            "twoFAEnabledStatus": "Aktiviert",
+            "oauthAutoRegister": "Konto bei erster Anmeldung automatisch erstellen",
+            "oauthAutoRegisterDesc": "Erstellt automatisch ein lokales Konto, wenn ein nicht verknüpfter Benutzer sich per OAuth anmeldet",
+            "oauthDefaultRole": "Standardrolle für neue Benutzer",
+            "oauthDefaultTeam": "Standardteam für neue Benutzer",
+            "oauthDefaultTeamNone": "Kein Team"
         },
         "domains": {
             "title": "Domains",
@@ -1262,7 +1267,8 @@
                 "remove_domain_permission": "Domain-Berechtigung entfernen",
                 "add_team_domain_permission": "Team-Domain-Berechtigung hinzufügen",
                 "update_team_domain_permission": "Team-Domain-Berechtigung aktualisieren",
-                "remove_team_domain_permission": "Team-Domain-Berechtigung entfernen"
+                "remove_team_domain_permission": "Team-Domain-Berechtigung entfernen",
+                "oauth_auto_provision": "OAuth-Konto automatisch erstellt"
             },
             "parts": {
                 "host": ", Host {host}",

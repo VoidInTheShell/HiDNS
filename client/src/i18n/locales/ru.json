@@ -704,7 +704,12 @@
             "securityPolicy": "Политика безопасности",
             "securityPolicyDesc": "Настроить параметры политики безопасности на уровне системы",
             "twoFADisabledStatus": "Отключено",
-            "twoFAEnabledStatus": "Включено"
+            "twoFAEnabledStatus": "Включено",
+            "oauthAutoRegister": "Автоматически создавать учётную запись при первом входе",
+            "oauthAutoRegisterDesc": "Автоматически создавать локальную учётную запись, когда непривязанный пользователь входит через OAuth",
+            "oauthDefaultRole": "Роль по умолчанию для новых пользователей",
+            "oauthDefaultTeam": "Команда по умолчанию для новых пользователей",
+            "oauthDefaultTeamNone": "Без команды"
         },
         "domains": {
             "title": "Домены",
@@ -1262,7 +1267,8 @@
                 "remove_domain_permission": "Удалить разрешение домена",
                 "add_team_domain_permission": "Добавить разрешение домена команды",
                 "update_team_domain_permission": "Обновить разрешение домена команды",
-                "remove_team_domain_permission": "Удалить разрешение домена команды"
+                "remove_team_domain_permission": "Удалить разрешение домена команды",
+                "oauth_auto_provision": "Автосоздание учётной записи OAuth"
             },
             "parts": {
                 "host": ", хост {host}",

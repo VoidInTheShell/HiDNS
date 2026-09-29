@@ -540,7 +540,12 @@
             "securityPolicyDesc": "Configurar los ajustes de política de seguridad a nivel del sistema",
             "require2FASystemDisabled": "Deshabilitado por el sistema",
             "twoFADisabledStatus": "Desactivado",
-            "twoFAEnabledStatus": "Activado"
+            "twoFAEnabledStatus": "Activado",
+            "oauthAutoRegister": "Crear cuenta automáticamente en el primer inicio de sesión",
+            "oauthAutoRegisterDesc": "Crea automáticamente una cuenta local cuando un usuario no vinculado inicia sesión mediante OAuth",
+            "oauthDefaultRole": "Rol predeterminado para nuevos usuarios",
+            "oauthDefaultTeam": "Equipo predeterminado para nuevos usuarios",
+            "oauthDefaultTeamNone": "Sin equipo"
         },
         "nav": {
             "settings": "Configuración"
@@ -1054,7 +1059,8 @@
                 "remove_domain_permission": "Eliminar permiso de dominio",
                 "add_team_domain_permission": "Agregar permiso de dominio de equipo",
                 "update_team_domain_permission": "Actualizar permiso de dominio de equipo",
-                "remove_team_domain_permission": "Eliminar permiso de dominio de equipo"
+                "remove_team_domain_permission": "Eliminar permiso de dominio de equipo",
+                "oauth_auto_provision": "Aprovisionamiento automático de OAuth"
             },
             "parts": {
                 "host": ", host {host}",

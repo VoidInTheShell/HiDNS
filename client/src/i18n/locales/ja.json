@@ -565,7 +565,12 @@
             "unbindOauth": "紐付け解除",
             "updateBackgroundImage": "背景画像を更新",
             "twoFADisabledStatus": "オフ",
-            "twoFAEnabledStatus": "オン"
+            "twoFAEnabledStatus": "オン",
+            "oauthAutoRegister": "初回ログイン時にアカウントを自動作成",
+            "oauthAutoRegisterDesc": "未バインドのユーザーが OAuth でログインした際にローカルアカウントを自動作成します",
+            "oauthDefaultRole": "新規ユーザーのデフォルトロール",
+            "oauthDefaultTeam": "新規ユーザーのデフォルトチーム",
+            "oauthDefaultTeamNone": "チームに追加しない"
         },
         "domains": {
             "tabs": {
@@ -1077,7 +1082,8 @@
                 "remove_domain_permission": "ドメイン権限を削除",
                 "add_team_domain_permission": "チームドメイン権限を追加",
                 "update_team_domain_permission": "チームドメイン権限を更新",
-                "remove_team_domain_permission": "チームドメイン権限を削除"
+                "remove_team_domain_permission": "チームドメイン権限を削除",
+                "oauth_auto_provision": "OAuth 自動アカウント作成"
             },
             "parts": {
                 "host": "、ホスト {host}",

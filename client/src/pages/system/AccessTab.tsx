@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button, Card, Input, Select, Space, Switch } from 'tdesign-react';
 import { BrowseIcon, BrowseOffIcon, CopyIcon, LockOnIcon, SecuredIcon, SettingIcon } from 'tdesign-icons-react';
-import { settingsApi } from '../../api';
+import { settingsApi, teamsApi } from '../../api';
 import { useToast } from '../../hooks/useToast';
 import { useI18n } from '../../contexts/I18nContext';
 
@@ -23,6 +23,9 @@ const DEFAULT_OAUTH_FORM = {
   scopes: 'openid profile email',
   redirectUri: '',
   providerHint: '',
+  autoRegister: false,
+  defaultRole: 1,
+  defaultTeamId: 0,
 };
 
 const DEFAULT_LOGTO_FORM = {
@@ -49,6 +52,18 @@ const accessField = (label: string, control: ReactNode) => (
     {control}
   </div>
 );
+
+/** 将服务端 OAuthConfig 合并进表单时规范化 JIT 字段（团队 null → 0 表示不加入） */
+const mergeOauthForm = (
+  prev: typeof DEFAULT_OAUTH_FORM,
+  config: Partial<Omit<typeof DEFAULT_OAUTH_FORM, 'defaultTeamId'>> & { defaultTeamId?: number | null }
+) => ({
+  ...prev,
+  ...config,
+  autoRegister: config.autoRegister === true,
+  defaultRole: Number(config.defaultRole) === 2 ? 2 : 1,
+  defaultTeamId: Number(config.defaultTeamId) > 0 ? Number(config.defaultTeamId) : 0,
+});
 
 export function AccessTab() {
   const { t } = useI18n();
@@ -96,7 +111,7 @@ export function AccessTab() {
 
   useEffect(() => {
     if (!oauthConfig) return;
-    setOauthForm((prev) => ({ ...prev, ...oauthConfig }));
+    setOauthForm((prev) => mergeOauthForm(prev, oauthConfig));
   }, [oauthConfig, oauthConfigUpdatedAt]);
 
   const revealJwtSecretMutation = useMutation({
@@ -111,6 +126,17 @@ export function AccessTab() {
       }
     },
     onError: (error: Error) => toast.error(error.message || t('system.jwtSecretVerifyFailed')),
+  });
+
+  const { data: teamList } = useQuery({
+    queryKey: ['teams'],
+    queryFn: async () => {
+      const res = await teamsApi.list();
+      if (res.data.code === 0 && res.data.data) {
+        return res.data.data;
+      }
+      throw new Error(res.data.msg);
+    },
   });
 
   const updateOauthMutation = useMutation({
@@ -130,6 +156,9 @@ export function AccessTab() {
       scopes: oauthForm.scopes.trim(),
       redirectUri: oauthForm.redirectUri.trim(),
       providerHint: oauthForm.providerHint.trim(),
+      autoRegister: oauthForm.autoRegister === true,
+      defaultRole: oauthForm.defaultRole === 2 ? 2 : 1,
+      defaultTeamId: oauthForm.defaultTeamId > 0 ? oauthForm.defaultTeamId : null,
     }),
     onSuccess: (res) => {
       if (res.data.code !== 0) {
@@ -137,7 +166,7 @@ export function AccessTab() {
         return;
       }
       if (res.data.data) {
-        setOauthForm((prev) => ({ ...prev, ...res.data.data }));
+        setOauthForm((prev) => mergeOauthForm(prev, res.data.data!));
       }
       toast.success(t('system.oauthSaved'));
     },
@@ -178,7 +207,7 @@ export function AccessTab() {
         return;
       }
       // Sync the discovered config to the form
-      setOauthForm((prev) => ({ ...prev, ...res.data.data }));
+      setOauthForm((prev) => mergeOauthForm(prev, res.data.data!));
       toast.success(t('system.oidcDiscoverSuccess'));
     },
     onError: (error: Error) => toast.error(error.message || t('system.oidcDiscoverFailed')),
@@ -206,8 +235,8 @@ export function AccessTab() {
   };
 
   const redirectUri = `${window.location.origin}/oauth/callback`;
-  const setOauthField = (key: keyof typeof oauthForm, value: string | boolean) => setOauthForm((form) => ({ ...form, [key]: value }));
-  const setLogtoField = (key: keyof typeof logtoForm, value: string | boolean) => setLogtoForm((form) => ({ ...form, [key]: value }));
+  const setOauthField = (key: keyof typeof oauthForm, value: string | boolean | number) => setOauthForm((form) => ({ ...form, [key]: value }));
+  const setLogtoField = (key: keyof typeof logtoForm, value: string | boolean | number) => setLogtoForm((form) => ({ ...form, [key]: value }));
 
   return (
     <div className="access-grid">
@@ -351,12 +380,40 @@ export function AccessTab() {
             {accessField(t('system.oauthRedirectUri'), (
               <Input readonly value={redirectUri} />
             ))}
+            {oauthForm.autoRegister && accessField(t('system.oauthDefaultRole'), (
+              <Select
+                value={oauthForm.defaultRole}
+                options={[
+                  { label: t('users.role1'), value: 1 },
+                  { label: t('users.role2'), value: 2 },
+                ]}
+                onChange={(value: any) => setOauthField('defaultRole', Number(Array.isArray(value) ? value[0] : value) || 1)}
+              />
+            ))}
+            {oauthForm.autoRegister && accessField(t('system.oauthDefaultTeam'), (
+              <Select
+                value={oauthForm.defaultTeamId}
+                options={[
+                  { label: t('system.oauthDefaultTeamNone'), value: 0 },
+                  ...(teamList ?? []).map((team) => ({ label: team.name, value: team.id })),
+                ]}
+                onChange={(value: any) => setOauthField('defaultTeamId', Number(Array.isArray(value) ? value[0] : value) || 0)}
+                placeholder={t('system.oauthDefaultTeamNone')}
+              />
+            ))}
           </div>
           <div className="settings-switch-row">
             <div>
               <strong>{t('system.oauthEnabled')}</strong>
             </div>
             <Switch value={oauthForm.enabled} onChange={(checked: any) => setOauthField('enabled', Boolean(checked))} />
+          </div>
+          <div className="settings-switch-row">
+            <div>
+              <strong>{t('system.oauthAutoRegister')}</strong>
+              <span>{t('system.oauthAutoRegisterDesc')}</span>
+            </div>
+            <Switch value={oauthForm.autoRegister} onChange={(checked: any) => setOauthField('autoRegister', Boolean(checked))} />
           </div>
           <Space className="record-form__actions">
             <Button variant="outline" loading={discoverOidcMutation.isPending} onClick={() => discoverOidcMutation.mutate()}>

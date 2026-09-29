@@ -122,7 +122,8 @@
                 "remove_domain_permission": "移除域名权限",
                 "add_team_domain_permission": "添加团队域名权限",
                 "update_team_domain_permission": "更新团队域名权限",
-                "remove_team_domain_permission": "移除团队域名权限"
+                "remove_team_domain_permission": "移除团队域名权限",
+                "oauth_auto_provision": "OAuth 自动建号哒"
             },
             "allActions": "全部操作",
             "clearFilters": "清空筛选",
@@ -1093,7 +1094,12 @@
             "unlockPlaceholder": "输入用户名或邮箱",
             "verifyAndViewJwt": "验证并查看",
             "versionDesc": "当前系统版本详情",
-            "versionInfo": "版本信息"
+            "versionInfo": "版本信息",
+            "oauthAutoRegister": "首次登录自动建号哒",
+            "oauthAutoRegisterDesc": "没绑定的小可爱用 OAuth 登录时，会自动给 TA 建一个本地账号哦",
+            "oauthDefaultRole": "新用户默认角色哒",
+            "oauthDefaultTeam": "新用户默认团队哒",
+            "oauthDefaultTeamNone": "不加入团队"
         },
         "teams": {
             "addMember": "添加成员",

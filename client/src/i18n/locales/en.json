@@ -704,7 +704,12 @@
             "oauthSaveFailed": "Failed to save OAuth config",
             "oidcAutoDiscover": "Auto Fetch via OIDC",
             "oidcDiscoverSuccess": "OIDC configuration fetched",
-            "oidcDiscoverFailed": "Failed to fetch OIDC configuration"
+            "oidcDiscoverFailed": "Failed to fetch OIDC configuration",
+            "oauthAutoRegister": "Auto-create account on first login",
+            "oauthAutoRegisterDesc": "Automatically create a local account when an unbound user signs in via OAuth",
+            "oauthDefaultRole": "Default role for new users",
+            "oauthDefaultTeam": "Default team for new users",
+            "oauthDefaultTeamNone": "No team"
         },
         "domains": {
             "title": "Domains",
@@ -1262,7 +1267,8 @@
                 "remove_domain_permission": "Remove Domain Permission",
                 "add_team_domain_permission": "Add Team Domain Permission",
                 "update_team_domain_permission": "Update Team Domain Permission",
-                "remove_team_domain_permission": "Remove Team Domain Permission"
+                "remove_team_domain_permission": "Remove Team Domain Permission",
+                "oauth_auto_provision": "OAuth Auto-provision"
             },
             "parts": {
                 "host": ", host {host}",
@@ -1534,11 +1540,11 @@
             "scopeLevelRead": "Read Only",
             "scopeLevelWrite": "Read/Write",
             "scopeModule": {
-              "ns_monitor": "NS Monitor",
-              "domain_management": "Domain Management",
-              "renewal_management": "Renewal Management",
-              "log_query": "Audit Logs",
-              "service_monitor": "Service Monitor"
+                "ns_monitor": "NS Monitor",
+                "domain_management": "Domain Management",
+                "renewal_management": "Renewal Management",
+                "log_query": "Audit Logs",
+                "service_monitor": "Service Monitor"
             },
             "oauthScopeEditTitle": "Edit Authorization Scope",
             "oauthScopeEditDesc": "Comma-separated list of permission scopes",

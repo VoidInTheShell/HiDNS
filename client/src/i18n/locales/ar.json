@@ -704,7 +704,12 @@
             "securityPolicy": "سياسة الأمان",
             "securityPolicyDesc": "تكوين إعدادات سياسة الأمان على مستوى النظام",
             "twoFADisabledStatus": "معطل",
-            "twoFAEnabledStatus": "مفعل"
+            "twoFAEnabledStatus": "مفعل",
+            "oauthAutoRegister": "إنشاء الحساب تلقائيًا عند أول تسجيل دخول",
+            "oauthAutoRegisterDesc": "إنشاء حساب محلي تلقائيًا عندما يسجّل مستخدم غير مرتبط الدخول عبر OAuth",
+            "oauthDefaultRole": "الدور الافتراضي للمستخدمين الجدد",
+            "oauthDefaultTeam": "الفريق الافتراضي للمستخدمين الجدد",
+            "oauthDefaultTeamNone": "بدون فريق"
         },
         "domains": {
             "title": "النطاقات",
@@ -1262,7 +1267,8 @@
                 "remove_domain_permission": "إزالة إذن النطاق",
                 "add_team_domain_permission": "إضافة إذن نطاق الفريق",
                 "update_team_domain_permission": "تحديث إذن نطاق الفريق",
-                "remove_team_domain_permission": "إزالة إذن نطاق الفريق"
+                "remove_team_domain_permission": "إزالة إذن نطاق الفريق",
+                "oauth_auto_provision": "إنشاء حساب OAuth تلقائيًا"
             },
             "parts": {
                 "host": "، المضيف {host}",
